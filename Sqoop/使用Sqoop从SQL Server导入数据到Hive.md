@@ -1,4 +1,4 @@
-1.首先要下载SQL Server JDBC驱动包(https://msdn.microsoft.com/zh-cn/library/mt683464.aspx)  
+1.首先要下载SQL Server JDBC驱动包https://msdn.microsoft.com/zh-cn/library/mt683464.aspx  
 
 2.将下载好的JDBC驱动包解压，并将sqljdbcXX.jar文件放置SQOOP_HOME/lib目录下(XX为版本号)  
 
