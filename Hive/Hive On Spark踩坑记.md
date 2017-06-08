@@ -1,7 +1,7 @@
 本文是我搭建Hive on Spark的一些经历，包括踩的各种坑，记录一下  
 
 首先说一下为什么要搭建本人为什么要搭建Hive on Spark呢？因为本人使用的Hive 2.1.1，每次输入hive命令准备启动Hive客户端的时候，命令行都会输出这样的一段信息:  
-![image](/Images/hive-on-spark.png)  
+![image](/Hive/Images/hive-on-spark.png)  
 信息中明确的说明了Hive on MapReduce在Hive 2中是过时的，并且在Hive未来的版本中可能是不可用的。推荐我们使用其他的执行引擎，比如：Tez、Spark，或者让我们使用1.x版本。Hive 2中的具有很多诱人的新特性，而且性能上有很大的提升，所以使用Hive 2肯定是大势所趋啊，重点是Hive on MapReduce真的是很慢啊。这里呢，本人也是跟着潮流走，准备将Hive的执行引擎切换成Spark。为什么不是Tez呢？这里就涉及到Tez是什么了？不知道的可以参考http://www.infoq.com/cn/articles/apache-tez-saha-murthy/ 这篇文章。我个人理解，Tez本质是就是一个升级版的MapReduce，速度上明显提升了，但是还是无法和Spark想提并论的。重要的是，现在是Spark的时代，火的不要不要的，当然跟着潮流走啊。但是Hive on Spark兴起没多久，没有Hive on Tez时间长，所以Hive on Spark的稳定性和兼容性没有Hive on Tez好，所以对速度没有很高要求的，还是可以考虑Hive on Tez的。好了，不废话，开始Hive on Spark之旅。  
 
 首先肯定要准备软件了，我刚开始搭建Hive on Spark的时候，准备的软件版本是Hive 2.1.1、Spark 2.1.1、Hadoop 2.7.3。那么搭建Hive on Spark，可以参考Hive官方文档https://cwiki.apache.org/confluence/display/Hive/Hive+on+Spark%3A+Getting+Started。 写了很多，总结了一下主要是下面几点：  
@@ -66,16 +66,16 @@ spark-yarn_2.11-2.1.1.jar
 为什么Hive 2.2.0开始变了呢？其实是有原因的，因为Hive 2.2.0之前，Hive on Spark是不支持Spark 2.x的。接下来的内容也会说到。
 
 然后就可以启动hive了。启动的时候没有问题，但是当你执行一个hql语句的时候，可能会报下面的错：  
-![image](/Images/hive-kryo.png)  
+![image](/Hive/Images/hive-kryo.png)  
 
 上面的错误的原因是与kryo有关的，其实是缺少了jar包，将$SPARK_HOME/jars/objenesis-2.1.jar包拷贝到$HIVE_HOME/lib下即可。  
 
 你满心欢喜的准备启动，执行hql命令，然而现实又给了你一记响亮的大嘴巴子。又报错了：  
-![image](/Images/hive-javasparklistener.png)  
+![image](/Hive/Images/hive-javasparklistener.png)  
 
 从上面的错误不难看出是缺少了org.apache.spark.JavaSparkListener这个类，可是这个类在哪呢？其实Spark 2.x的时候，已经把这个类给移除了，是不是很懵逼。这个其实也是Hive on Spark的一个bug，根本上说是Hive对Spark 2.x还没有完全支持，但是从Hive 2.2.0开始，修复了对Spark 2.x的支持。那我们该怎么办？两种解决方案，要么把Spark换成1.x，要么把Hive换成2.2.0及以上版本。可是Hive 2.2.0发布，本人本想从GitHub上下载Hive 2.2源码自己编译的，可是没成功，尴尬了。不得已将Spark换成1.6.3。换成Spark之后，需要从拷贝Spark的jar包。  
 
 OK，我们再一次满心欢喜的启动Hive并且执行HQL，FUNK，有报错了：
-![image](/Images/hive-SERVER.png)  
+![image](/Hive/Images/hive-SERVER.png)  
 
 只要是报java.lang.NoSuchFieldError: SPARK_RPC_XXX之类的错，都是因为Spark包的问题，在使用Hive on Spark的时候，Spark包中不能够带有对Hive相关的支持，也就是说编译Spark的时候不能够带-Phive参数，我们这里使用的是官方已经编译好的Spark，里面是带有对hive的支持的，所以我们不得不自己从新编译Spark。编译参考官方文档。
