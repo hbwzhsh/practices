@@ -93,7 +93,7 @@ hive> set hive.spark.job.monitor.timeout=600;
 或者在hive-site.xml文件中设置：
 ```xml
 <property>
-  <name>hive.spark.job.monitor.timeout=600</name>
+  <name>hive.spark.job.monitor.timeout</name>
   <value>600</value>
 </property>
 ```  
