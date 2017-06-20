@@ -75,7 +75,7 @@ spark-yarn_2.11-2.1.1.jar
 
 从上面的错误不难看出是缺少了org.apache.spark.JavaSparkListener这个类，可是这个类在哪呢？其实Spark 2.x的时候，已经把这个类给移除了，是不是很懵逼。这个其实也是Hive on Spark的一个bug，根本上说是Hive对Spark 2.x还没有完全支持，但是从Hive 2.2.0开始，修复了对Spark 2.x的支持。那我们该怎么办？两种解决方案，要么把Spark换成1.x，要么把Hive换成2.2.0及以上版本。可是Hive 2.2.0发布，本人本想从GitHub上下载Hive 2.2源码自己编译的，可是没成功，尴尬了。不得已将Spark换成1.6.3。换成Spark之后，需要从拷贝Spark的jar包。  
 
-OK，我们再一次满心欢喜的启动Hive并且执行HQL，FUNK，有报错了：
+OK，我们再一次满心欢喜的启动Hive并且执行HQL，又报错了：
 ![image](/Hive/Images/hive-SERVER.png)  
 
 只要是报java.lang.NoSuchFieldError: SPARK_RPC_XXX之类的错，都是因为Spark包的问题，在使用Hive on Spark的时候，Spark包中不能够带有对Hive相关的支持，也就是说编译Spark的时候不能够带-Phive参数，我们这里使用的是官方已经编译好的Spark，里面是带有对hive的支持的，所以我们不得不自己从新编译Spark。编译参考官方文档。  
