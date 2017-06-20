@@ -78,4 +78,26 @@ spark-yarn_2.11-2.1.1.jar
 OK，我们再一次满心欢喜的启动Hive并且执行HQL，FUNK，有报错了：
 ![image](/Hive/Images/hive-SERVER.png)  
 
-只要是报java.lang.NoSuchFieldError: SPARK_RPC_XXX之类的错，都是因为Spark包的问题，在使用Hive on Spark的时候，Spark包中不能够带有对Hive相关的支持，也就是说编译Spark的时候不能够带-Phive参数，我们这里使用的是官方已经编译好的Spark，里面是带有对hive的支持的，所以我们不得不自己从新编译Spark。编译参考官方文档。
+只要是报java.lang.NoSuchFieldError: SPARK_RPC_XXX之类的错，都是因为Spark包的问题，在使用Hive on Spark的时候，Spark包中不能够带有对Hive相关的支持，也就是说编译Spark的时候不能够带-Phive参数，我们这里使用的是官方已经编译好的Spark，里面是带有对hive的支持的，所以我们不得不自己从新编译Spark。编译参考官方文档。  
+
+这里我自己从新编译了一份Spark 1.6.3，从新又安装了一次。再次执行，可惜又报错了，报错如下：  
+![image](/Hive/Images/Hive-on-spark-timeout.png)  
+
+从图中可以看出Hive执行的HQL语句已经变成了Spark任务，不错，这是好的开端。那么从图中标红的报错信息并没有看出特别的原因，可以到/tmp/$USER/hive.log日志中查看具体的日志信息，下图是我截出来的报错信息：  
+![image](/Hive/Images/Hive-on-spark-timeout2.png)  
+
+通过分析原因，不难分析出其实是超时了，超过60s任务没有提交成功就自动失败了，关闭了连接。解决方案是通过设置hive.spark.job.monitor.timeout参数，该参数的默认值就是60秒，该参数的含义就是监控Spark任务获取任务状态的超时时间，60s内任务如果没有被成功提交，就会失败。所以我们将该参数调大。设置方式有两种，直接在hive命令行设置如下：
+```shell
+hive> set hive.spark.job.monitor.timeout=600;
+```  
+或者在hive-site.xml文件中设置：
+```xml
+<property>
+  <name>hive.spark.job.monitor.timeout=600</name>
+  <value>600</value>
+</property>
+```  
+设置好之后，再运行一遍任务，结果如下：  
+![image](/Hive/Images/Hive-on-spark-success.png)  
+
+哈哈，成功了！是不是有点小激动！
