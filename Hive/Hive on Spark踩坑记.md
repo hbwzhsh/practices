@@ -1,6 +1,6 @@
 本文是我搭建Hive on Spark的一些经历，包括踩的各种坑，记录一下  
 
-首先说一下为什么要搭建本人为什么要搭建Hive on Spark呢？因为本人使用的Hive 2.1.1，每次输入hive命令准备启动Hive客户端的时候，命令行都会输出这样的一段信息:  
+首先说一下本人为什么要搭建Hive on Spark呢？因为本人使用的是Hive 2.1.1，每次输入hive命令准备启动Hive客户端的时候，命令行都会输出这样的一段信息:  
 ![image](/Hive/Images/hive-on-spark.png)  
 信息中明确的说明了Hive on MapReduce在Hive 2中是过时的，并且在Hive未来的版本中可能是不可用的。推荐我们使用其他的执行引擎，比如：Tez、Spark，或者让我们使用1.x版本。Hive 2中的具有很多诱人的新特性，而且性能上有很大的提升，所以使用Hive 2肯定是大势所趋啊，重点是Hive on MapReduce真的是很慢啊。这里呢，本人也是跟着潮流走，准备将Hive的执行引擎切换成Spark。为什么不是Tez呢？这里就涉及到Tez是什么了？不知道的可以参考http://www.infoq.com/cn/articles/apache-tez-saha-murthy/ 这篇文章。我个人理解，Tez本质是就是一个升级版的MapReduce，速度上明显提升了，但是还是无法和Spark想提并论的。重要的是，现在是Spark的时代，火的不要不要的，当然跟着潮流走啊。但是Hive on Spark兴起没多久，没有Hive on Tez时间长，所以Hive on Spark的稳定性和兼容性没有Hive on Tez好，所以对速度没有很高要求的，还是可以考虑Hive on Tez的。好了，不废话，开始Hive on Spark之旅。  
 
